@@ -57,7 +57,7 @@ def generate_password_rand(char_pool):
         chars_left -= 1
     #append last character to final password
     final_pass += char_pool[0]
-    #return final password
+    #output final password
     print(final_pass)
     return 
 
