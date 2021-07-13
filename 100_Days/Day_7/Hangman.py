@@ -1,111 +1,86 @@
 import random
-
-list_of_words = [
-"rehearsal",
-"prosper",
-"proposal",
-"hear",
-"trust",
-"profit",
-"include",
-"threaten",
-"crash",
-"attraction",
-"car",
-"opposed",
-"winter",
-"bulb",
-"lamb",
-"common",
-"amuse",
-"plant",
-"illness",
-"example",
-"rehabilitation",
-"revise",
-"power",
-"sum",
-"polish",
-"productive",
-"drill",
-"TRUE",
-"guitar",
-"defendant",
-"review",
-"division",
-"cart",
-"creation",
-"guess",
-"jest",
-"grave",
-"shape",
-"fiction",
-"embryo",
-"remember",
-"wire",
-"show",
-"gallery",
-"calm",
-"acid",
-"decline",
-"salad",
-"grief",
-"regulation"
-]
-
-def generate_random_int(max_num):
-    return random.randint(0, max_num-1)
+import hangman_words
+import hangman_art
 
 
-index = generate_random_int(len(list_of_words))
-word_to_guess = list(list_of_words[index])
-print(word_to_guess)
-reveal_word = ["_" for x in word_to_guess]
-
-display_word = ""
-for letter in reveal_word:
-    display_word += letter
-print(display_word)
-
-has_won = False
-has_lost = False
-user_lives = 5
-
-
-while not has_won or has_lost:
-    
+def get_user_guess():
     user_guess = input("Guess a letter: ")
-    user_guess_exists = False
-    for x in range(len(word_to_guess)):
+    return user_guess
+
+
+def user_guess_exists(user_guess):
+    if user_guess in word_to_guess:
+        return True
+    return False
+
+
+def guess_correct(user_guess):
+    for x in range(len(reveal_word)):
         if user_guess == word_to_guess[x]:
             reveal_word[x] = user_guess
-            user_guess_exists = True
+            word_to_guess[x] = " "
+    return
 
-    if not user_guess_exists:
-        print("Letter not found in word")
-        user_lives -= 1
-    if user_lives == 0:
-        has_lost = True
-        print("You lost")
-        break
-        
-        
+def guess_incorrect():
+    global user_lives
+    print(hangman_art.stages[user_lives])
+    user_lives -= 1
+    print(f"Letter does not exist {user_lives + 1} guesses remaining")
+    return
+
+
+def handle_win_loss():
+    global is_playing
+    if win_condition == word_to_guess:
+        print("You won!")
+        is_playing = False
+    elif user_lives < 0:
+        print(f"You lost. The word was {winning_word}")
+        is_playing = False
+    return
+
+
+def join_string(word_to_join):
     display_word = ""
-    for letter in reveal_word:
+    for letter in word_to_join:
         display_word += letter
+    return display_word
 
-    if list(display_word) == word_to_guess:
-        has_won = True
+def initialize_game():
+    global list_of_words, word_to_guess, winning_word, win_condition, reveal_word, is_playing, user_lives
 
-    print(display_word)
+    list_of_words = hangman_words.get_words()
+    word_to_guess = list(random.choice(list_of_words))
+    winning_word = join_string(word_to_guess)
+    win_condition = [" " for x in word_to_guess]
+    reveal_word = ["_" for x in word_to_guess]
+
+    is_playing = True
+    user_lives = len(hangman_art.stages) - 1
+
+    print(hangman_art.logo)
+    print(join_string(reveal_word))
 
 
-# Hangman game cycle
-    # Get word to guess
-    # Ask user for guess 
-    # If guess was a letter, check if it is in the guessed word.
-        # If it is, reveal letter
-    # Check if user has won
-        # If no more letters in word, user won
-        # If not ask for guess
-    # If guess was incorrect, subtract from lives
+def start_game():
+    while is_playing:    
+        # get user guess
+        user_guess = get_user_guess()
+        # check if guess is correct
+        if user_guess_exists(user_guess):
+            #if it is update letters
+            guess_correct(user_guess)
+        else:
+            #if not, subtract lives 
+            guess_incorrect()
+        # Print word
+        print(join_string(reveal_word))
+        # check if win loss
+            #if win, print win and exit
+            #if loss, print loss and exit
+        handle_win_loss()
+        # repeat
+
+
+initialize_game()
+start_game()
